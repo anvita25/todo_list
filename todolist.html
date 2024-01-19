@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    #taskList {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .task {
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .task input[type="checkbox"] {
+      margin-right: 10px;
+    }
+
+    #taskInput {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>To-Do List</h1>
+
+  <div>
+    <label for="taskInput">New Task:</label>
+    <input type="text" id="taskInput" placeholder="Enter task title">
+    <button onclick="addTask()">Add Task</button>
+  </div>
+
+  <ul id="taskList"></ul>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', loadTasks);
+
+    function addTask() {
+      const taskInput = document.getElementById('taskInput');
+      const taskTitle = taskInput.value.trim();
+
+      if (taskTitle === '') {
+        alert('Please enter a task title.');
+        return;
+      }
+
+      const tasks = getTasks();
+      const newTask = { title: taskTitle, description: '', completed: false };
+      tasks.push(newTask);
+      saveTasks(tasks);
+      taskInput.value = '';
+      displayTasks();
+    }
+
+    function displayTasks() {
+      const taskList = document.getElementById('taskList');
+      taskList.innerHTML = '';
+
+      const tasks = getTasks();
+      tasks.forEach((task, index) => {
+        const listItem = document.createElement('li');
+        listItem.className = 'task';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = task.completed;
+        checkbox.addEventListener('change', () => toggleTaskCompletion(index));
+
+        const title = document.createElement('span');
+        title.textContent = task.title;
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', () => deleteTask(index));
+
+        listItem.appendChild(checkbox);
+        listItem.appendChild(title);
+        listItem.appendChild(deleteButton);
+        taskList.appendChild(listItem);
+      });
+    }
+
+    function toggleTaskCompletion(index) {
+      const tasks = getTasks();
+      tasks[index].completed = !tasks[index].completed;
+      saveTasks(tasks);
+      displayTasks();
+    }
+
+    function deleteTask(index) {
+      const tasks = getTasks();
+      tasks.splice(index, 1);
+      saveTasks(tasks);
+      displayTasks();
+    }
+
+    function saveTasks(tasks) {
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    function getTasks() {
+      const storedTasks = localStorage.getItem('tasks');
+      return storedTasks ? JSON.parse(storedTasks) : [];
+    }
+
+    function loadTasks() {
+      displayTasks();
+    }
+  </script>
+</body>
+</html>
